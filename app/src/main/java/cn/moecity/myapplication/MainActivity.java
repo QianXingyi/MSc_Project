@@ -35,8 +35,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import org.json.JSONArray;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,35 +64,26 @@ public class MainActivity extends AppCompatActivity {
     private Node dirTemp;
     private Boolean isDone = false;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        latLngView = findViewById(R.id.textView);
-        createLocationRequest();
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-                updateLocInfo(locationResult);
+    private static String readMyInputStream(InputStream is) {
+        //binary result to string
+        byte[] result;
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = is.read(buffer)) != -1) {
+                baos.write(buffer, 0, len);
+            }
+            is.close();
+            baos.close();
+            result = baos.toByteArray();
 
-            }
-        };
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        locationUpdate();
-        nodeList = nodeDao.CreateNodes();
-        JSONArray jsonArray = nodeDao.SaveToJSON(nodeList);
-        Log.e("JSON", jsonArray.toString());
-        listView = findViewById(R.id.showNode);
-        updateList();
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.e("click", visibleList.get(position).getLocName());
-                nodeList = nodeDao.UnlockNode(nodeList, visibleList.get(position).getNodeNo());
-                updateList();
-            }
-        });
+        } catch (IOException e) {
+            e.printStackTrace();
+            String errorStr = "error in getting data";
+            return errorStr;
+        }
+        return new String(result);
     }
 
     @Override
@@ -124,7 +113,44 @@ public class MainActivity extends AppCompatActivity {
                 locationCallback, Looper.myLooper());
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        latLngView = findViewById(R.id.textView);
+        listView = findViewById(R.id.showNode);
+        createLocationRequest();
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                updateLocInfo(locationResult);
+            }
+        };
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //initial location Services
+
+        locationUpdate();
+
+        nodeList = nodeDao.CreateNodes();
+
+        //For the function of using file to import nodes
+        //JSONArray jsonArray = nodeDao.SaveToJSON(nodeList);
+        //Log.e("JSON", jsonArray.toString());
+
+        updateList();
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.e("click", visibleList.get(position).getLocName());
+                nodeList = nodeDao.UnlockNode(nodeList, visibleList.get(position).getNodeNo());
+                updateList();
+            }
+        });
+    }
+
     protected void createLocationRequest() {
+        //get permission
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(100);
         locationRequest.setFastestInterval(100);
@@ -152,8 +178,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     private void locationUpdate() {
+        //initial location info
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
@@ -199,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
                 myNextLoc.setLatitude(nowLocation.getMyLocation().getLocLatLng().latitude);
                 currentLoc = locationResult.getLastLocation();
                 distanceTemp = (int) locationResult.getLastLocation().distanceTo(myNextLoc);
+                //put the distances between nodes and the current location into the object
                 visibleList.get(i).setDistanceToCurrent(distanceTemp);
                 //Log.e("nextLoc",myNextLoc.getProvider()+","+visibleList.get(i).getDistanceToCurrent());
                 if (visibleList.get(i).getDistanceToCurrent() <= 20) {
@@ -224,7 +251,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void updateDirection() {
+
+    }
+
     private void updateList() {
+        //update the list of nodes
         List<Map<String, Object>> listItems = new ArrayList<Map<String, Object>>();
         visibleList = new ArrayList<>();
         for (int i = 0; i < nodeList.size(); i++) {
@@ -258,11 +290,8 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(simpleAdapter);
     }
 
-    private void updateDirection(){
-
-    }
-
     private class AfterDelayTask extends AsyncTask {
+        //delay for user moving
         @Override
         protected Object doInBackground(Object[] objects) {
             try {
@@ -286,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class DelayAsyncTask extends AsyncTask {
-
+        //delay for data input to object
         @Override
         protected Object doInBackground(Object[] objects) {
             try {
@@ -327,31 +356,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private static String readMyInputStream(InputStream is) {
-        byte[] result;
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = is.read(buffer)) != -1) {
-                baos.write(buffer, 0, len);
-            }
-            is.close();
-            baos.close();
-            result = baos.toByteArray();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            String errorStr = "error in getting data";
-            return errorStr;
-        }
-        return new String(result);
-    }
-
-
     private class DirectionApiTask extends AsyncTask<Object, Object, Message> {
-
-
+        //class to connect Direction Api
         @Override
         protected Message doInBackground(Object... objects) {
             int code;
@@ -402,7 +408,7 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(message);
             switch (message.what) {
                 case 1:
-                    /**
+                    /*
                      * get Direction API Data
                      */
                     JSONDao jsonDao = new JSONDao();
