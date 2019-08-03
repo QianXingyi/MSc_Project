@@ -293,6 +293,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateDirection(){
+        //what need to do after done
 
     }
 
