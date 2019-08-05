@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onSuccess(Location location) {
                         if (location != null) {
                             myNextLoc = new Location("");
-                            myNextLoc.setLongitude(nodeList.get(6).getMyLocation().getLocLatLng().longitude);
+                            myNextLoc.setLongitude(nodeList.get(0).getMyLocation().getLocLatLng().longitude);
                             myNextLoc.setLatitude(nodeList.get(0).getMyLocation().getLocLatLng().latitude);
                             latLngView.setText(location.getProvider() + ","
                                     + location.getLatitude() + ","
