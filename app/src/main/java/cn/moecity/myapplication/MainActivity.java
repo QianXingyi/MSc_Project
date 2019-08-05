@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.Message;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -43,6 +44,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private int durValue;
     private Node dirTemp;
     private Boolean isDone = false;
+    private TextToSpeech mSpeech = null;
 
     private static String readMyInputStream(InputStream is) {
         //binary result to string
@@ -213,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void updateLocInfo(LocationResult locationResult){
+    private void updateLocInfo(LocationResult locationResult) {
         if (locationResult.getLastLocation() != null) {
             myNextLoc = new Location("");
             Node nowLocation;
@@ -431,6 +434,20 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 default:
                     break;
+            }
+        }
+    }
+
+    private class TTSListener implements TextToSpeech.OnInitListener {
+        @Override
+        public void onInit(int status) {
+            if (status == TextToSpeech.SUCCESS) {
+                int supported = mSpeech.setLanguage(Locale.UK);
+                if (supported != TextToSpeech.LANG_COUNTRY_AVAILABLE) {
+                    Toast.makeText(getApplicationContext(), "Language unavailable", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Language available", Toast.LENGTH_LONG).show();
+                }
             }
         }
     }
