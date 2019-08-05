@@ -65,8 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private int durValue;
     private Node dirTemp;
     private Boolean isDone = false;
-    private TextToSpeech mSpeech = null;
-
+    private TextToSpeech mSpeech;
     private static String readMyInputStream(InputStream is) {
         //binary result to string
         byte[] result;
@@ -120,10 +119,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mSpeech = new TextToSpeech(MainActivity.this, new TTSListener());
         latLngView = findViewById(R.id.textView);
         listView = findViewById(R.id.showNode);
         createLocationRequest();
+        mSpeech = new TextToSpeech(MainActivity.this, new TTSListener());
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -247,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
             if (isDone) {
                 //get new direction
                 //start new route
-                updateDirection();
+                updateDirection(locationResult);
                 isDone = false;
             }
         } else {
@@ -255,8 +254,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void updateDirection() {
+    private void updateDirection(LocationResult locationResult) {
+        for (int i = 0; i < steps.size(); i++) {
 
+            int disTemp = (int) steps.get(i).getStarLocation().distanceTo(currentLoc);
+            if (disTemp <= 20 && !mSpeech.isSpeaking()) {
+                mSpeech.speak(steps.get(i).getHtmlMsg(), TextToSpeech.QUEUE_FLUSH, null, null);
+                steps.remove(steps.get(i));
+            }
+        }
     }
 
     private void updateList() {
@@ -443,6 +449,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onInit(int status) {
             if (status == TextToSpeech.SUCCESS) {
+                //Toast.makeText(getApplicationContext(),"TTS success",Toast.LENGTH_SHORT).show();
                 int supported = mSpeech.setLanguage(Locale.UK);
                 if (supported != TextToSpeech.LANG_COUNTRY_AVAILABLE) {
                     Toast.makeText(getApplicationContext(), "Language unavailable", Toast.LENGTH_LONG).show();
