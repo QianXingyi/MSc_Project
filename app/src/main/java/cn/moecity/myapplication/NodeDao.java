@@ -70,14 +70,13 @@ public class NodeDao {
     public List<Node> UnlockNode(List<Node> nodeList,int unLockId){
         List<Node> newList=new ArrayList<>();
 
-        for (int i = 0; i < nodeList.size(); i++) {
-            Node temp=new Node();
-            temp=nodeList.get(i);
-            if (temp.getNodeNo()==unLockId){
-                temp.setLocked(false);
-                temp.setVisible(false);
+        for (Node node : nodeList) {
+
+            if (node.getNodeNo() == unLockId) {
+                node.setLocked(false);
+                node.setVisible(false);
             }
-            newList.add(temp);
+            newList.add(node);
         }
         return checkVisible(newList);
     }
@@ -89,16 +88,14 @@ public class NodeDao {
         List<Node> newList=new ArrayList<>();
         Set<Integer> visibleList=new HashSet<>();
         Set<Integer> newVisibleList=new HashSet<>();
-        for (int i = 0; i < nodeList.size(); i++) {
-            Node temp=new Node();
-            temp=nodeList.get(i);
-            if (temp.getVisible()==false&&temp.getLocked()==false){
-                unLockedListNo.add(temp.getNodeNo());
-                nearNext.addAll(temp.getNextNode());
-            }else if (temp.getVisible()==false&&temp.getLocked()==true){
-                lockedList.add(temp.getNodeNo());
-            }else if(temp.getVisible()==true&&temp.getLocked()==false){
-                visibleList.add(temp.getNodeNo());
+        for (Node node : nodeList) {
+            if (node.getVisible() == false && node.getLocked() == false) {
+                unLockedListNo.add(node.getNodeNo());
+                nearNext.addAll(node.getNextNode());
+            } else if (node.getVisible() == false && node.getLocked() == true) {
+                lockedList.add(node.getNodeNo());
+            } else if (node.getVisible() == true && node.getLocked() == false) {
+                visibleList.add(node.getNodeNo());
             }
         }
 
@@ -107,19 +104,18 @@ public class NodeDao {
         nearNext.removeAll(visibleList);
         List<Integer> nearNextList=new ArrayList<Integer>(nearNext);
 
-        for (int i = 0; i < nearNextList.size(); i++) {
-            for (int j = 0; j < nodeList.size(); j++) {
-                if (nodeList.get(j).getNodeNo()==nearNextList.get(i)){
-                    Node temp=nodeList.get(j);
+        for (int nearNextNo : nearNextList) {
+            for (Node temp : nodeList) {
+                if (temp.getNodeNo() == nearNextNo) {
                     int tempCount=0;
-                    for (int k = 0; k < temp.getPreNode().size(); k++) {
-                        if (unLockedListNo.contains(temp.getPreNode().get(k))){
+                    for (int nodeNo : temp.getPreNode()) {
+                        if (unLockedListNo.contains(nodeNo)) {
                             tempCount++;
-                            Log.e("count",tempCount+"");
+                            //Log.e("count",tempCount+"");
                         }
                     }
                     if (tempCount==temp.getPreCount()){
-                        lockedList.remove(nearNextList.get(i));
+                        lockedList.remove(nearNextNo);
                         unLockedListNo.addAll(temp.getPreNode());
                         newVisibleList.add(temp.getNodeNo());
                         newVisibleList.removeAll(temp.getPreNode());
@@ -127,25 +123,24 @@ public class NodeDao {
                 }
             }
         }
-        Log.e("next",IntToString(new ArrayList<Integer>(nearNext)));
-        Log.e("lockedList",IntToString(new ArrayList<Integer>(lockedList)));
-        Log.e("unLockedListNo",IntToString(new ArrayList<Integer>(unLockedListNo)));
-        Log.e("newVisibleList",IntToString(new ArrayList<Integer>(newVisibleList)));
-        for (int i = 0; i < nodeList.size(); i++) {
-            Node newTemp= new Node();
-            newTemp=nodeList.get(i);
-            if (lockedList.contains(newTemp.getNodeNo())){
-                newTemp.setLocked(true);
-                newTemp.setVisible(false);
-            }else if (unLockedListNo.contains(newTemp.getNodeNo())){
-                newTemp.setLocked(false);
-                newTemp.setVisible(false);
-            }else if (newVisibleList.contains(newTemp.getNodeNo())){
-                newTemp.setLocked(true);
-                newTemp.setVisible(true);
+//        Log.e("next",IntToString(new ArrayList<Integer>(nearNext)));
+//        Log.e("lockedList",IntToString(new ArrayList<Integer>(lockedList)));
+//        Log.e("unLockedListNo",IntToString(new ArrayList<Integer>(unLockedListNo)));
+//        Log.e("newVisibleList",IntToString(new ArrayList<Integer>(newVisibleList)));
+        for (Node node : nodeList) {
+
+            if (lockedList.contains(node.getNodeNo())) {
+                node.setLocked(true);
+                node.setVisible(false);
+            } else if (unLockedListNo.contains(node.getNodeNo())) {
+                node.setLocked(false);
+                node.setVisible(false);
+            } else if (newVisibleList.contains(node.getNodeNo())) {
+                node.setLocked(true);
+                node.setVisible(true);
 
             }
-            newList.add(newTemp);
+            newList.add(node);
         }
 
 
@@ -154,8 +149,8 @@ public class NodeDao {
 
     public String IntToString(List<Integer> integerList){
         String out="[";
-        for (int i = 0; i < integerList.size(); i++) {
-            out+=integerList.get(i)+",";
+        for (int i : integerList) {
+            out += i + ",";
         }
         if (out.length()>1)
         out=out.substring(0,out.length()-1);
@@ -165,21 +160,19 @@ public class NodeDao {
 
     public JSONArray SaveToJSON(List<Node> nodeList){
         JSONArray jsonArray=new JSONArray();
-        Node temp=new Node();
-        for (int i = 0; i < nodeList.size(); i++) {
+        for (Node node : nodeList) {
             JSONObject jsonObject=new JSONObject();
-            temp=nodeList.get(i);
             try {
-                jsonObject.put("nodeNo",temp.getNodeNo());
-                jsonObject.put("preCount",temp.getPreCount());
-                jsonObject.put("preNode", IntToString(temp.getPreNode()));
-                jsonObject.put("hasNext",temp.getHasNext());
-                jsonObject.put("nextNode",IntToString(temp.getNextNode()));
-                jsonObject.put("isVisible",temp.getVisible());
-                jsonObject.put("isLocked",temp.getLocked());
-                jsonObject.put("locID",temp.getLocID());
-                jsonObject.put("locName",temp.getLocName());
-                jsonObject.put("distanceToCurrent",temp.getDistanceToCurrent()+"m");
+                jsonObject.put("nodeNo", node.getNodeNo());
+                jsonObject.put("preCount", node.getPreCount());
+                jsonObject.put("preNode", IntToString(node.getPreNode()));
+                jsonObject.put("hasNext", node.getHasNext());
+                jsonObject.put("nextNode", IntToString(node.getNextNode()));
+                jsonObject.put("isVisible", node.getVisible());
+                jsonObject.put("isLocked", node.getLocked());
+                jsonObject.put("locID", node.getLocID());
+                jsonObject.put("locName", node.getLocName());
+                jsonObject.put("distanceToCurrent", node.getDistanceToCurrent() + "m");
                 jsonArray.put(jsonObject);
 
             } catch (JSONException e) {
