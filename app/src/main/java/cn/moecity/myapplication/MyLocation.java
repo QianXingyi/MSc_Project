@@ -10,7 +10,8 @@ public class MyLocation {
     private LatLng locLatLng;
     private Boolean isNode;
     private Location location;
-    public MyLocation(){
+
+    public MyLocation() {
 
     }
 
@@ -19,7 +20,7 @@ public class MyLocation {
         this.locName = locName;
         this.locLatLng = locLatLng;
         this.isNode = isNode;
-        location=new Location("");
+        location = new Location("UoS AAR");
         location.setLatitude(locLatLng.latitude);
         location.setLongitude(locLatLng.longitude);
     }
@@ -38,14 +39,6 @@ public class MyLocation {
 
     public void setLocName(String locName) {
         this.locName = locName;
-    }
-
-    public LatLng getLocLatLng() {
-        return locLatLng;
-    }
-
-    public void setLocLatLng(LatLng locLatLng) {
-        this.locLatLng = locLatLng;
     }
 
     public Boolean getNode() {
@@ -67,6 +60,7 @@ public class MyLocation {
                 ", locName='" + locName + '\'' +
                 ", locLatLng=" + locLatLng +
                 ", isNode=" + isNode +
+                ", location=" + location +
                 '}';
     }
 }

@@ -203,8 +203,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onSuccess(Location location) {
                         if (location != null) {
                             myNextLoc = new Location("");
-                            myNextLoc.setLongitude(nodeList.get(0).getMyLocation().getLocLatLng().longitude);
-                            myNextLoc.setLatitude(nodeList.get(0).getMyLocation().getLocLatLng().latitude);
+                            myNextLoc.setLongitude(nodeList.get(0).getMyLocation().getLocation().getLongitude());
+                            myNextLoc.setLatitude(nodeList.get(0).getMyLocation().getLocation().getLatitude());
                             latLngView.setText(location.getProvider() + ","
                                     + location.getLatitude() + ","
                                     + location.getLongitude() +
@@ -220,11 +220,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateLocInfo(LocationResult locationResult) {
         if (locationResult.getLastLocation() != null) {
-            myNextLoc = new Location("");
+            myNextLoc = new Location(getString(R.string.app_name));
             for (Node nowLocation : visibleList) {
                 myNextLoc.setProvider(nowLocation.getLocName());
-                myNextLoc.setLongitude(nowLocation.getMyLocation().getLocLatLng().longitude);
-                myNextLoc.setLatitude(nowLocation.getMyLocation().getLocLatLng().latitude);
+                myNextLoc.setLongitude(nowLocation.getMyLocation().getLocation().getLongitude());
+                myNextLoc.setLatitude(nowLocation.getMyLocation().getLocation().getLatitude());
                 currentLoc = locationResult.getLastLocation();
                 distanceTemp = (int) locationResult.getLastLocation().distanceTo(myNextLoc);
                 //put the distances between nodes and the current location into the object
