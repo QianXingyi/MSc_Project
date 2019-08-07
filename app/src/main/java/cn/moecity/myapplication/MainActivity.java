@@ -83,8 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         } catch (IOException e) {
             e.printStackTrace();
-            String errorStr = "error in getting data";
-            return errorStr;
+            return "Error in reading stream!";
         }
         return new String(result);
     }
@@ -147,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.e("click", visibleList.get(position).getLocName());
+                //Log.e("click", visibleList.get(position).getLocName());
                 nodeList = nodeDao.UnlockNode(nodeList, visibleList.get(position).getNodeNo());
                 updateList();
             }
@@ -209,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
                                     + location.getLatitude() + ","
                                     + location.getLongitude() +
                                     "," + location.distanceTo(myNextLoc) + "m");
-                            Log.e("initial", "get the initial data");
+                            //Log.e("initial", "get the initial data");
                             updateList();
                         } else {
                             latLngView.setText("No");
@@ -241,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
                     + "," + locationResult.getLastLocation().getLatitude() + ","
                     + locationResult.getLastLocation().getLongitude()
                     + ",\n" + nodeDao.SaveToJSON(visibleList));
-            Log.e("location", "get");
+            Log.e("location update", "get");
             if (isDone) {
                 //get new direction
                 //start new route
@@ -290,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
             AfterDelayTask afterDelayTask = new AfterDelayTask();
             afterDelayTask.execute(30000);
         } else {
-            Log.e("direction", "direction");
+            //Log.e("direction", "direction");
             isDone = false;
             DelayAsyncTask delayAsyncTask = new DelayAsyncTask();
             delayAsyncTask.execute(3000);
@@ -307,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
         protected Object doInBackground(Object[] objects) {
             try {
                 stopLocationUpdates();
-                Log.e("msg", "block");
+                Log.e("msg", "long block");
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -359,7 +358,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             }
-            Log.e("direction is", dirTemp.getLocName());
+            //Log.e("direction is", dirTemp.getLocName());
             detailView.setText(dirTemp.getLocName() + "\n" + steps.toString());
             DirectionApiTask directionApiTask = new DirectionApiTask();
             directionApiTask.execute(5000);
@@ -373,7 +372,7 @@ public class MainActivity extends AppCompatActivity {
         protected Message doInBackground(Object... objects) {
             int code;
             try {
-                String path = "https://maps.googleapis.com/maps/api/directions/" +
+                String path = getString(R.string.direction_api_address) +
                         "json?" +
                         "&language=en-gb" +
                         "&mode=walking" +
@@ -423,21 +422,21 @@ public class MainActivity extends AppCompatActivity {
                      * get Direction API Data
                      */
                     JSONDao jsonDao = new JSONDao();
-                    Toast.makeText(MainActivity.this, "getting data OK", Toast.LENGTH_SHORT)
+                    Toast.makeText(getApplicationContext(), "Getting data OK", Toast.LENGTH_SHORT)
                             .show();
                     //Log.e("countlocation",visibleList.get(count).getLocName());
                     steps = jsonDao.getStepList(message.obj.toString());
-                    Log.e("steps thread", steps.toString());
+                    //Log.e("steps thread", steps.toString());
                     disValue = jsonDao.getDistance(message.obj.toString());
                     durValue = jsonDao.getDuration(message.obj.toString());
                     isDone = true;
                     break;
                 case 0:
-                    Toast.makeText(MainActivity.this, "getting data error", Toast.LENGTH_SHORT)
+                    Toast.makeText(getApplicationContext(), "getting data error", Toast.LENGTH_SHORT)
                             .show();
                     break;
                 case 2:
-                    Toast.makeText(MainActivity.this, "request code error, not 200",
+                    Toast.makeText(getApplicationContext(), "request code error, not 200",
                             Toast.LENGTH_SHORT).show();
                     break;
                 default:
@@ -455,7 +454,7 @@ public class MainActivity extends AppCompatActivity {
                 if (supported != TextToSpeech.LANG_COUNTRY_AVAILABLE) {
                     Toast.makeText(getApplicationContext(), "Language unavailable", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Language available", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), "Language available", Toast.LENGTH_LONG).show();
                 }
             }
         }
