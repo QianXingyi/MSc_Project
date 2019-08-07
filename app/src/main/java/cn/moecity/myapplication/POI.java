@@ -94,8 +94,8 @@ public class POI {
                 "poiID=" + poiID +
                 ", distance=" + distance +
                 ", duration=" + duration +
-                ", starLocation=" + starLocation +
-                ", endLocation=" + endLocation +
+                ", starLocation=" + starLocation.getLatitude() + "," + starLocation.getLongitude() +
+                ", endLocation=" + endLocation.getLatitude() + "," + endLocation.getLongitude() +
                 ", htmlMsg='" + htmlMsg + '\'' +
                 '}';
     }

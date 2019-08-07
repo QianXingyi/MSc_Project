@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private NodeDao nodeDao = new NodeDao();
     private SimpleAdapter simpleAdapter;
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
-    private TextView latLngView;
+    private TextView latLngView, detailView;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         latLngView = findViewById(R.id.textView);
         listView = findViewById(R.id.showNode);
+        detailView = findViewById(R.id.textView2);
         createLocationRequest();
         mSpeech = new TextToSpeech(MainActivity.this, new TTSListener());
         locationCallback = new LocationCallback() {
@@ -245,7 +246,6 @@ public class MainActivity extends AppCompatActivity {
                 //get new direction
                 //start new route
                 updateDirection(locationResult);
-                isDone = false;
             }
         } else {
             latLngView.setText("No location data!");
@@ -257,11 +257,13 @@ public class MainActivity extends AppCompatActivity {
 
             int disTemp = (int) step.getStarLocation().distanceTo(currentLoc);
             if (disTemp <= 20 && !mSpeech.isSpeaking() && !step.getUsed()) {
+                isDone = true;
                 String speakStr = step.getHtmlMsg();
                 mSpeech.speak(speakStr, TextToSpeech.QUEUE_FLUSH, null, null);
                 step.setUsed(true);
             }
         }
+        detailView.setText(dirTemp.getLocName() + "\n" + steps.toString());
     }
 
     private void updateList() {
@@ -358,6 +360,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
             Log.e("direction is", dirTemp.getLocName());
+            detailView.setText(dirTemp.getLocName() + "\n" + steps.toString());
             DirectionApiTask directionApiTask = new DirectionApiTask();
             directionApiTask.execute(5000);
         }

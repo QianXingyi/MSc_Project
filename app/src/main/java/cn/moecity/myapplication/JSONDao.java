@@ -1,8 +1,5 @@
 package cn.moecity.myapplication;
 
-import android.location.Location;
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -79,8 +76,7 @@ public class JSONDao {
                 objTemp.setDuration(jsonObject.getJSONObject("duration").getInt("value"));
                 objTemp.setPoiID(i);
                 objTemp.setHtmlMsg(jsonObject.getString("html_instructions")
-                        .replaceAll("<b>","")
-                        .replaceAll("<\\/b>",""));
+                        .replaceAll("<[^>]*>", " "));
                 Double startLat,startLng,endLat,endLng;
                 startLat=jsonObject.getJSONObject("start_location").getDouble("lat");
                 startLng=jsonObject.getJSONObject("start_location").getDouble("lng");
