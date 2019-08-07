@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private Node dirTemp;
     private Boolean isDone = false;
     private TextToSpeech mSpeech;
+
     private static String readMyInputStream(InputStream is) {
         //binary result to string
         byte[] result;
@@ -219,19 +220,17 @@ public class MainActivity extends AppCompatActivity {
     private void updateLocInfo(LocationResult locationResult) {
         if (locationResult.getLastLocation() != null) {
             myNextLoc = new Location("");
-            Node nowLocation;
-            for (int i = 0; i < visibleList.size(); i++) {
-                nowLocation = new Node();
-                nowLocation = visibleList.get(i);
+            for (Node nowLocation : visibleList) {
+
                 myNextLoc.setProvider(nowLocation.getLocName());
                 myNextLoc.setLongitude(nowLocation.getMyLocation().getLocLatLng().longitude);
                 myNextLoc.setLatitude(nowLocation.getMyLocation().getLocLatLng().latitude);
                 currentLoc = locationResult.getLastLocation();
                 distanceTemp = (int) locationResult.getLastLocation().distanceTo(myNextLoc);
                 //put the distances between nodes and the current location into the object
-                visibleList.get(i).setDistanceToCurrent(distanceTemp);
+                nowLocation.setDistanceToCurrent(distanceTemp);
                 //Log.e("nextLoc",myNextLoc.getProvider()+","+visibleList.get(i).getDistanceToCurrent());
-                if (visibleList.get(i).getDistanceToCurrent() <= 20) {
+                if (nowLocation.getDistanceToCurrent() <= 20) {
                     nodeList = nodeDao.UnlockNode(nodeList, nowLocation.getNodeNo());
                     updateList();
 
@@ -255,12 +254,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateDirection(LocationResult locationResult) {
-        for (int i = 0; i < steps.size(); i++) {
+        for (POI step : steps) {
 
-            int disTemp = (int) steps.get(i).getStarLocation().distanceTo(currentLoc);
-            if (disTemp <= 20 && !mSpeech.isSpeaking()) {
-                mSpeech.speak(steps.get(i).getHtmlMsg(), TextToSpeech.QUEUE_FLUSH, null, null);
-                steps.remove(steps.get(i));
+            int disTemp = (int) step.getStarLocation().distanceTo(currentLoc);
+            if (disTemp <= 20 && !mSpeech.isSpeaking() && !step.getUsed()) {
+                String speakStr = step.getHtmlMsg();
+                mSpeech.speak(speakStr, TextToSpeech.QUEUE_FLUSH, null, null);
+                step.setUsed(true);
             }
         }
     }
@@ -269,19 +269,19 @@ public class MainActivity extends AppCompatActivity {
         //update the list of nodes
         List<Map<String, Object>> listItems = new ArrayList<Map<String, Object>>();
         visibleList = new ArrayList<>();
-        for (int i = 0; i < nodeList.size(); i++) {
-            if (nodeList.get(i).getVisible())
-                visibleList.add(nodeList.get(i));
+        for (Node tempNode : nodeList) {
+            if (tempNode.getVisible())
+                visibleList.add(tempNode);
         }
         if (visibleList.size() <= 0) {
             nodeList = nodeDao.CreateNodes();
             updateList();
         }
-        for (int i = 0; i < visibleList.size(); i++) {
+        for (Node visibleNode : visibleList) {
             Map<String, Object> listItem = new HashMap<String, Object>();
             listItem.put("icon", R.mipmap.ic_launcher_round);
-            listItem.put("name", visibleList.get(i).getLocName());
-            listItem.put("nodeNo", visibleList.get(i).getNodeNo());
+            listItem.put("name", visibleNode.getLocName());
+            listItem.put("nodeNo", visibleNode.getNodeNo());
             listItems.add(listItem);
         }
         if (visibleList.size() > 1) {
@@ -345,19 +345,18 @@ public class MainActivity extends AppCompatActivity {
             startLocationUpdates();
             Log.e("msg", "recovered");
 
+            //Init the data with the first node in visible list
+            destinationLoc = visibleList.get(0).getMyLocation().getLocation();
+            disDir = visibleList.get(0).getDistanceToCurrent();
+            dirTemp = visibleList.get(0);
+            for (Node visibleNode : visibleList) {
 
-            for (int i = 0; i < visibleList.size(); i++) {
-                if (i == 0) {
-                    destinationLoc = visibleList.get(i).getMyLocation().getLocation();
-                    disDir = visibleList.get(i).getDistanceToCurrent();
-                    dirTemp = visibleList.get(i);
-                } else {
-                    if (visibleList.get(i).getDistanceToCurrent() < disDir) {
-                        destinationLoc = visibleList.get(i).getMyLocation().getLocation();
-                        disDir = visibleList.get(i).getDistanceToCurrent();
-                        dirTemp = visibleList.get(i);
-                    }
+                if (visibleNode.getDistanceToCurrent() < disDir) {
+                    destinationLoc = visibleNode.getMyLocation().getLocation();
+                    disDir = visibleNode.getDistanceToCurrent();
+                    dirTemp = visibleNode;
                 }
+
             }
             Log.e("direction is", dirTemp.getLocName());
             DirectionApiTask directionApiTask = new DirectionApiTask();

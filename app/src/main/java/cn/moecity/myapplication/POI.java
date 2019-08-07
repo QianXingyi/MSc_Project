@@ -10,17 +10,28 @@ public class POI {
     private Location starLocation;
     private Location endLocation;
     private String htmlMsg;
+    private Boolean isUsed;
 
     public POI() {
+        isUsed = false;
     }
 
-    public POI(int poiID, int distance, int duration, Location starLocation, Location endLocation, String htmlMsg) {
+    public POI(int poiID, int distance, int duration, Location starLocation, Location endLocation, String htmlMsg, Boolean isUsed) {
         this.poiID = poiID;
         this.distance = distance;
         this.duration = duration;
         this.starLocation = starLocation;
         this.endLocation = endLocation;
         this.htmlMsg = htmlMsg;
+        this.isUsed = isUsed;
+    }
+
+    public Boolean getUsed() {
+        return isUsed;
+    }
+
+    public void setUsed(Boolean used) {
+        isUsed = used;
     }
 
     public int getPoiID() {
