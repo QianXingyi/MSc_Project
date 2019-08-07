@@ -221,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
         if (locationResult.getLastLocation() != null) {
             myNextLoc = new Location("");
             for (Node nowLocation : visibleList) {
-
+                //
                 myNextLoc.setProvider(nowLocation.getLocName());
                 myNextLoc.setLongitude(nowLocation.getMyLocation().getLocLatLng().longitude);
                 myNextLoc.setLatitude(nowLocation.getMyLocation().getLocLatLng().latitude);
