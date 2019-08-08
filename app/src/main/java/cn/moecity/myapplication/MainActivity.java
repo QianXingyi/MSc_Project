@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private int durValue;
     private Node dirTemp;
     private Boolean isDone = false;
+    private Boolean isStart=false;
     private TextToSpeech mSpeech;
 
     private static String readMyInputStream(InputStream is) {
@@ -244,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
             if (isDone) {
                 //get new direction
                 //start new route
+                Log.e("location update", "poi");
                 updateDirection(locationResult);
             }
         } else {
@@ -252,16 +254,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateDirection(LocationResult locationResult) {
-        for (POI step : steps) {
 
+        for (POI step : steps) {
             int disTemp = (int) step.getStarLocation().distanceTo(currentLoc);
             if (disTemp <= 20 && !mSpeech.isSpeaking() && !step.getUsed()) {
                 isDone = true;
                 String speakStr = step.getHtmlMsg();
                 mSpeech.speak(speakStr, TextToSpeech.QUEUE_FLUSH, null, null);
+                //Log.e("poi",step.getPoiID()+"");
                 step.setUsed(true);
+                isStart=true;
             }
         }
+        if (!isStart&&!mSpeech.isSpeaking()){
+            mSpeech.speak("Please go to the main road!", TextToSpeech.QUEUE_FLUSH, null, null);
+            isStart=true;
+        }
+
         detailView.setText(dirTemp.getLocName() + "\n" + steps.toString());
     }
 
@@ -426,6 +435,7 @@ public class MainActivity extends AppCompatActivity {
                             .show();
                     //Log.e("countlocation",visibleList.get(count).getLocName());
                     steps = jsonDao.getStepList(message.obj.toString());
+                    isStart=false;
                     //Log.e("steps thread", steps.toString());
                     disValue = jsonDao.getDistance(message.obj.toString());
                     durValue = jsonDao.getDuration(message.obj.toString());
@@ -453,9 +463,10 @@ public class MainActivity extends AppCompatActivity {
                 int supported = mSpeech.setLanguage(Locale.UK);
                 if (supported != TextToSpeech.LANG_COUNTRY_AVAILABLE) {
                     Toast.makeText(getApplicationContext(), "Language unavailable", Toast.LENGTH_LONG).show();
-                } else {
-                    //Toast.makeText(getApplicationContext(), "Language available", Toast.LENGTH_LONG).show();
                 }
+//                else {
+//                    //Toast.makeText(getApplicationContext(), "Language available", Toast.LENGTH_LONG).show();
+//                }
             }
         }
     }
