@@ -173,6 +173,7 @@ public class NodeDao {
                 jsonObject.put("locID", node.getLocID());
                 jsonObject.put("locName", node.getLocName());
                 jsonObject.put("distanceToCurrent", node.getDistanceToCurrent() + "m");
+                jsonObject.put("bearingToCurrent",node.getBearingToCurrent()+".");
                 jsonArray.put(jsonObject);
 
             } catch (JSONException e) {

@@ -14,6 +14,7 @@ public class Node {
     private MyLocation myLocation;
     private int locID;
     private int distanceToCurrent;
+    private int  bearingToCurrent;
     private String locName;
 
     public Node() {
@@ -38,6 +39,14 @@ public class Node {
 
     public void setDistanceToCurrent(int distanceToCurrent) {
         this.distanceToCurrent = distanceToCurrent;
+    }
+
+    public int getBearingToCurrent() {
+        return bearingToCurrent;
+    }
+
+    public void setBearingToCurrent(int bearingToCurrent) {
+        this.bearingToCurrent = bearingToCurrent;
     }
 
     public int getNodeNo() {

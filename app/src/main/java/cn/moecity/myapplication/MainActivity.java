@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
     private int distanceTemp;
+    private int bearingTemp;
     private Location myNextLoc, currentLoc, destinationLoc;
     private List<POI> steps = new ArrayList<>();
     private int disValue, disDir;
@@ -208,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                             latLngView.setText(location.getProvider() + ","
                                     + location.getLatitude() + ","
                                     + location.getLongitude() +
-                                    "," + location.distanceTo(myNextLoc) + "m");
+                                    "," + location.distanceTo(myNextLoc) + "m,"+location.bearingTo(myNextLoc)+".");
                             //Log.e("initial", "get the initial data");
                             updateList();
                         } else {
@@ -227,8 +228,10 @@ public class MainActivity extends AppCompatActivity {
                 myNextLoc.setLatitude(nowLocation.getMyLocation().getLocation().getLatitude());
                 currentLoc = locationResult.getLastLocation();
                 distanceTemp = (int) locationResult.getLastLocation().distanceTo(myNextLoc);
+                bearingTemp=(int)locationResult.getLastLocation().bearingTo(myNextLoc);
                 //put the distances between nodes and the current location into the object
                 nowLocation.setDistanceToCurrent(distanceTemp);
+                nowLocation.setBearingToCurrent(bearingTemp);
                 //Log.e("nextLoc",myNextLoc.getProvider()+","+visibleList.get(i).getDistanceToCurrent());
                 if (nowLocation.getDistanceToCurrent() <= 20) {
                     nodeList = nodeDao.UnlockNode(nodeList, nowLocation.getNodeNo());
@@ -254,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateDirection(LocationResult locationResult) {
-
+        ///Speak out the steps
         for (POI step : steps) {
             int disTemp = (int) step.getStarLocation().distanceTo(currentLoc);
             if (disTemp <= 20 && !mSpeech.isSpeaking() && !step.getUsed()) {
@@ -266,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
                 isStart=true;
             }
         }
+        ///User indoor or not on the main rd
         if (!isStart&&!mSpeech.isSpeaking()){
             mSpeech.speak("Please go to the main road!", TextToSpeech.QUEUE_FLUSH, null, null);
             isStart=true;
