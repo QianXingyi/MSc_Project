@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private Boolean isDone = false;
     private Boolean isStart=false;
     private TextToSpeech mSpeech;
+    private Button startBtn;
 
     private static String readMyInputStream(InputStream is) {
         //binary result to string
@@ -153,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 updateList();
             }
         });
+
     }
 
     protected void createLocationRequest() {

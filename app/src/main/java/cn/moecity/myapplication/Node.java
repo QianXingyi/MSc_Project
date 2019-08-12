@@ -46,7 +46,11 @@ public class Node {
     }
 
     public void setBearingToCurrent(int bearingToCurrent) {
+        if (bearingToCurrent>=0)
         this.bearingToCurrent = bearingToCurrent;
+        else {
+            this.bearingToCurrent = bearingToCurrent+360;
+        }
     }
 
     public int getNodeNo() {
