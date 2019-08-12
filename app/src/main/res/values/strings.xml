@@ -3,5 +3,5 @@
     <string name="title_activity_maps">Map</string>
     <string name="direction_api_address">https://maps.googleapis.com/maps/api/directions/</string>
     <string name="welcome_op">Welcome, freshman. I am your guide. Today I will lead you to experience a day as an ECS MSc student.</string>
-    <string name="click_to_go">Now, press the button in the middle of the screen to start our journey!</string>
+    <string name="click_to_go">Now, press the button below to start our journey!</string>
 </resources>
