@@ -4,4 +4,10 @@
     <string name="direction_api_address">https://maps.googleapis.com/maps/api/directions/</string>
     <string name="welcome_op">Welcome, freshman. I am your guide. Today I will lead you to experience a day as an ECS MSc student.</string>
     <string name="click_to_go">Now, press the button below to start our journey!</string>
+    <string-array name="story_array">
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Earth</item>
+        <item>Mars</item>
+    </string-array>
 </resources>
