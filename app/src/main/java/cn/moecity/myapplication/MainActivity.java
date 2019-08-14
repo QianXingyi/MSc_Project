@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         stopLocationUpdates();
+        mSpeech.shutdown();
     }
 
     private void stopLocationUpdates() {
@@ -181,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void refreshString(int destNo,String locName) {
         initString();
-
+        String temp="OK! Then you want to go to"+locName+",right?";
         switch (destNo) {
             case 1:
                 opString = interchange_op;
@@ -196,17 +197,17 @@ public class MainActivity extends AppCompatActivity {
                 edString = building_58_ed;
                 break;
             case 4:
-                opString = restaurant_op;
+                opString = temp+restaurant_op;
                 edString = restaurant_ed;
                 break;
 
             case 5:
-                opString = library_op;
+                opString = temp+library_op;
                 edString = library_ed;
                 break;
 
             case 6:
-                opString = shop_op;
+                opString = temp+shop_op;
                 edString = shop_ed;
                 break;
             case 7:
@@ -216,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
             case 8:
             case 9:
             case 10:
-                String temp="OK! You want"+locName+".";
+
                 switch (choseLoc){
                     case 0:
                         opString=temp+loc1_op;
@@ -407,8 +408,7 @@ public class MainActivity extends AppCompatActivity {
         //update the list of nodes
         List<Map<String, Object>> listItems = new ArrayList<Map<String, Object>>();
         visibleList = new ArrayList<>();
-        if (!mSpeech.isSpeaking())
-            mSpeech.speak(edString, TextToSpeech.QUEUE_FLUSH, null, null);
+        checkEdSpeak();
         for (Node tempNode : nodeList) {
             if (tempNode.getVisible())
                 visibleList.add(tempNode);
@@ -432,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
             //Log.e("direction", "direction");
             isDone = false;
             DelayAsyncTask delayAsyncTask = new DelayAsyncTask();
-            delayAsyncTask.execute(30000);
+            delayAsyncTask.execute(3000);
         }
         simpleAdapter = new SimpleAdapter(this, listItems, R.layout.listitem,
                 new String[]{"icon", "name", "nodeNo"},
@@ -447,7 +447,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 stopLocationUpdates();
                 Log.e("msg", "long block");
-                Thread.sleep(3000);
+                Thread.sleep(30000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
 
@@ -504,12 +504,27 @@ public class MainActivity extends AppCompatActivity {
             //Log.e("direction is", dirTemp.getLocName());
             refreshString(destNo,dirTemp.getLocName());
             detailView.setText(dirTemp.getLocName() + "\n" + steps.toString()+"\n"+destNo);
-            if (!mSpeech.isSpeaking())
-                mSpeech.speak(opString, TextToSpeech.QUEUE_FLUSH, null, null);
+            checkOpSpeak();
             DirectionApiTask directionApiTask = new DirectionApiTask();
             directionApiTask.execute(5000);
         }
 
+    }
+
+    private void checkOpSpeak(){
+        if (mSpeech.isSpeaking()){
+            checkOpSpeak();
+        }else {
+            mSpeech.speak(opString, TextToSpeech.QUEUE_FLUSH, null, null);
+        }
+    }
+
+    private void checkEdSpeak(){
+        if (mSpeech.isSpeaking()){
+            checkEdSpeak();
+        }else {
+            mSpeech.speak(edString, TextToSpeech.QUEUE_FLUSH, null, null);
+        }
     }
 
     private class DirectionApiTask extends AsyncTask<Object, Object, Message> {

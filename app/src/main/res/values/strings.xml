@@ -29,7 +29,7 @@
             You can just go to the building 16 nearby, it is the ECS lab for MSc students, you can also go to the hartley library.
             Or you can go to the Zepler Building Lab. It is just near the Mountbatten Building! So which do you prefer?</string>
     <string name="loc1_op">OK, just do it!</string>
-    <string name="loc1_ed">Finished? Come on! If you don\'t like it, we can go to another place!</string>
+    <string name="loc1_ed">Are you sure you have finished? Come on! If you don\'t like it, we can go to another place!</string>
     <string name="loc2_op">It\'s great that you are happy with this place!</string>
     <string name="loc2_ed">Great! You work so hard! Let\'s go to the Jubilee Sports Centre to have fun. It\'s Building 18, just near the SUSU Shop!</string>
     <string name="sports_op">The Jubilee Sports Centre on Highfield Campus is a state-of-the-art £8.5 million complex, boasting an array of high quality facilities.
