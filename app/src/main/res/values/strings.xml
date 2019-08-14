@@ -4,10 +4,38 @@
     <string name="direction_api_address">https://maps.googleapis.com/maps/api/directions/</string>
     <string name="welcome_op">Welcome, freshman. I am your guide. Today I will lead you to experience a day as an ECS MSc student.</string>
     <string name="click_to_go">Now, press the button below to start our journey!</string>
+    <string name="interchange_op">Hi, freshman! Let\'s go to the Interchange first. Interchange is the transportation center of Southampton University. Almost all UniLink buses stop here. These buses will take you to any place in Southampton.</string>
+    <string name="interchange_at">Now we are arriving at the University Interchange. Remember, you can use your unlink card to take the bus of any route start with U.
+            And the routes end with C are usually go to the city centre.</string>
+    <string name="building_53_op">OK, let\'s go to the Building 53 to see your mentor, who is usually a PhD student and will help you in the future.</string>
+    <string name="building_53_ed">Great, we are in Building 53 now. It is also called Mountbatten Building which is named after a school leader of ECS.
+        Freshman, I think you have to attend your Software Modelling class now! Go to the building 58 now! It is just near the Building 53!
+    </string>
+    <string name="building_58_op">Hum, we are just on time! Listen, Building 58 is also called Murray Building, it is where Mathematics School located in.
+            As a ECS student, sometimes you have lectures in the building belongs to another school.</string>
+    <string name="building_58_ed">Hey, it is 12 o\'clock now, let\'s go to have lunch! And your tutor is waiting you in the Library.
+            What's more don't forget to go to the SUSU shop to buy some notebooks.
+           Where do you want to go first?</string>
+
     <string-array name="story_array">
-        <item>Mercury</item>
-        <item>Venus</item>
-        <item>Earth</item>
-        <item>Mars</item>
+        <item>Great! Let's go to the piazza restaurant to enjoy half chicken meal! It's in Building 42, I will lead you there!</item>
+        <item>OK! Go to the Hartley Library it's building 36. And you may need to cross the road.
+            Be careful to watch the traffic lights when crossing the road.</item>
+        <item>SUSU shop is a good choice to save money! It's in Building 57，Let's go!.</item>
+        <item>Here we are at restaurant, you can enjoy any food you like here! Let's just finish the lunch and go to the next point!</item>
+        <item>Go! your tutor is sitting in the cafe! See you later! And let's go to the next point!</item>
+        <item>Here we are in SUSU shop! I think you can have a job here if you want to work in the university. OK, let's go to the next point!</item>
+        <item>Do you know you will have a MSc project this year? Go to the Building 32 to meet your supervisor Dave in room 3031!</item>
+        <item>I think you can do well in your MSc project!
+            However, if you want to do your project well, I think you can start learning from now! Now, let's do it!
+            You can just go to the building 16 nearby, it is the ECS lab for MSc students, you can also go to the hartley library.
+            Or you can go to the Zepler Building Lab. It is just near the Mountbatten Building! So which do you prefer?
+        </item>
+        <item>Finished? Come on! If you don't like it, we can go to another place!</item>
+        <item>Great! You work so hard! Let's go to the Jubilee Sports Centre to have fun. It's Building 18, just near the SUSU Shop!</item>
+        <item>Here we are at Jubilee Sports Hall! You can see the swimming pool, and there is also a gym and indoor basketball court.</item>
+        <item>That's all about today, freshman! Go to the interchange and catch a bus, see you tomorrow!</item>
+
+
     </string-array>
 </resources>
