@@ -1,9 +1,15 @@
 package cn.moecity.myapplication;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
@@ -63,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
     private int distanceTemp;
     private int bearingTemp;
     private Location myNextLoc, currentLoc, destinationLoc;
-    private int destNo;
+    private int destNo, destDir;
     private List<POI> steps = new ArrayList<>();
-    private int disValue, disDir;
+    private int disValue, disDir, userDir, destDis;
     private int durValue;
     private Node dirTemp;
     private Boolean isDone = false;
@@ -85,6 +91,21 @@ public class MainActivity extends AppCompatActivity {
     private String end_op, end_ed;
     private String opString, edString;
     private int choseLoc;
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
+    private Button mBtn;
+    float[] mValues;
+    private MediaPlayer mediaPlayer;
+    private SensorEventListener mListener = new SensorEventListener() {
+        public void onSensorChanged(SensorEvent event) {
+            mValues = event.values;
+            float direction = mValues[0];
+            userDir = (int) direction;
+        }
+
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+    };
 
 
     private static String readMyInputStream(InputStream is) {
@@ -111,6 +132,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        mSensorManager.registerListener(mListener, mSensor,
+                SensorManager.SENSOR_DELAY_GAME);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         startLocationUpdates();
     }
@@ -118,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        mSensorManager.unregisterListener(mListener);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         stopLocationUpdates();
         mSpeech.shutdown();
@@ -140,13 +164,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initString();
-        choseLoc=0;
-        destNo=0;
+        choseLoc = 0;
+        destNo = 0;
+        destDir = 0;
+        destDis = 0;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
         latLngView = findViewById(R.id.textView);
         listView = findViewById(R.id.showNode);
         detailView = findViewById(R.id.textView2);
+        mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bibi);
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
         createLocationRequest();
         mSpeech = new TextToSpeech(MainActivity.this, new TTSListener());
         locationCallback = new LocationCallback() {
@@ -162,8 +191,8 @@ public class MainActivity extends AppCompatActivity {
         locationUpdate();
 
         nodeList = nodeDao.CreateNodes();
-        opString=interchange_op;
-        edString=interchange_ed;
+        opString = interchange_op;
+        edString = interchange_ed;
         //For the function of using file to import nodes
         //JSONArray jsonArray = nodeDao.SaveToJSON(nodeList);
         //Log.e("JSON", jsonArray.toString());
@@ -180,9 +209,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void refreshString(int destNo,String locName) {
+    private void refreshString(int destNo, String locName) {
         initString();
-        String temp="OK! Then you want to go to"+locName+",right?";
+        String temp = "OK! Then you want to go to" + locName + ",right?";
         switch (destNo) {
             case 1:
                 opString = interchange_op;
@@ -197,17 +226,17 @@ public class MainActivity extends AppCompatActivity {
                 edString = building_58_ed;
                 break;
             case 4:
-                opString = temp+restaurant_op;
+                opString = temp + restaurant_op;
                 edString = restaurant_ed;
                 break;
 
             case 5:
-                opString = temp+library_op;
+                opString = temp + library_op;
                 edString = library_ed;
                 break;
 
             case 6:
-                opString = temp+shop_op;
+                opString = temp + shop_op;
                 edString = shop_ed;
                 break;
             case 7:
@@ -218,27 +247,27 @@ public class MainActivity extends AppCompatActivity {
             case 9:
             case 10:
 
-                switch (choseLoc){
+                switch (choseLoc) {
                     case 0:
-                        opString=temp+loc1_op;
-                        edString=loc1_ed;
+                        opString = temp + loc1_op;
+                        edString = loc1_ed;
                         choseLoc++;
                         break;
                     case 1:
-                        opString=temp+loc2_op;
-                        edString=loc2_ed;
-                        choseLoc=3;
+                        opString = temp + loc2_op;
+                        edString = loc2_ed;
+                        choseLoc = 3;
                         break;
                 }
                 break;
             case 11:
-                opString=sports_op;
-                edString=sports_ed;
+                opString = sports_op;
+                edString = sports_ed;
                 break;
             case 12:
-                opString=end_op;
-                edString=end_ed;
-                choseLoc=0;
+                opString = end_op;
+                edString = end_ed;
+                choseLoc = 0;
                 break;
         }
     }
@@ -246,8 +275,8 @@ public class MainActivity extends AppCompatActivity {
     protected void createLocationRequest() {
         //get permission
         locationRequest = LocationRequest.create();
-        locationRequest.setInterval(100);
-        locationRequest.setFastestInterval(100);
+        locationRequest.setInterval(3000);
+        locationRequest.setFastestInterval(3000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
         SettingsClient client = LocationServices.getSettingsClient(this);
@@ -359,6 +388,10 @@ public class MainActivity extends AppCompatActivity {
                 nowLocation.setDistanceToCurrent(distanceTemp);
                 nowLocation.setBearingToCurrent(bearingTemp);
                 //Log.e("nextLoc",myNextLoc.getProvider()+","+visibleList.get(i).getDistanceToCurrent());
+                if (nowLocation.getNodeNo() == destNo) {
+                    destDir = bearingTemp;
+                    destDis = distanceTemp;
+                }
                 if (nowLocation.getDistanceToCurrent() <= 20) {
                     nodeList = nodeDao.UnlockNode(nodeList, nowLocation.getNodeNo());
                     updateList();
@@ -366,6 +399,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            //for mediaPlayer
             latLngView.setText(locationResult.getLastLocation().getProvider()
                     + "," + locationResult.getLastLocation().getLatitude() + ","
                     + locationResult.getLastLocation().getLongitude()
@@ -375,6 +409,7 @@ public class MainActivity extends AppCompatActivity {
                 //get new direction
                 //start new route
                 Log.e("location update", "poi");
+                setMediaPlayer();
                 updateDirection(locationResult);
             }
         } else {
@@ -440,6 +475,34 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(simpleAdapter);
     }
 
+    private void setMediaPlayer() {
+        if (!mSpeech.isSpeaking()) {
+            mediaPlayer.stop();
+            if (destDis > 200)
+                mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bibi_2);
+            else if (destDis > 100)
+                mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bibi_1);
+            else
+                mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bibi);
+            if (destDir>userDir){
+                if (destDir-userDir>180)
+                    mediaPlayer.setVolume(1.0f, 0.0f);
+                else
+                    mediaPlayer.setVolume(0.0f, 1.0f);
+            }else{
+
+                if (userDir-destDir>180)
+                    mediaPlayer.setVolume(0.0f, 1.0f);
+                else
+                    mediaPlayer.setVolume(1.0f, 0.0f);
+            }
+            mediaPlayer.start();
+        } else {
+            setMediaPlayer();
+        }
+
+    }
+
     private class AfterDelayTask extends AsyncTask {
         //delay for user moving
         @Override
@@ -488,22 +551,26 @@ public class MainActivity extends AppCompatActivity {
 
             //Init the data with the first node in visible list
             destinationLoc = visibleList.get(0).getMyLocation().getLocation();
-            destNo=visibleList.get(0).getNodeNo();
+            destNo = visibleList.get(0).getNodeNo();
+            destDir = visibleList.get(0).getBearingToCurrent();
             disDir = visibleList.get(0).getDistanceToCurrent();
+            destDis = disDir;
             dirTemp = visibleList.get(0);
             for (Node visibleNode : visibleList) {
 
                 if (visibleNode.getDistanceToCurrent() < disDir) {
                     destinationLoc = visibleNode.getMyLocation().getLocation();
-                    destNo=visibleNode.getNodeNo();
+                    destNo = visibleNode.getNodeNo();
+                    destDir = visibleNode.getBearingToCurrent();
                     disDir = visibleNode.getDistanceToCurrent();
                     dirTemp = visibleNode;
+                    destDis = disDir;
                 }
 
             }
             //Log.e("direction is", dirTemp.getLocName());
-            refreshString(destNo,dirTemp.getLocName());
-            detailView.setText(dirTemp.getLocName() + "\n" + steps.toString()+"\n"+destNo);
+            refreshString(destNo, dirTemp.getLocName());
+            detailView.setText(dirTemp.getLocName() + "\n" + steps.toString() + "\n" + destNo + "\n" + destDir);
             checkOpSpeak();
             DirectionApiTask directionApiTask = new DirectionApiTask();
             directionApiTask.execute(5000);
@@ -511,18 +578,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void checkOpSpeak(){
-        if (mSpeech.isSpeaking()){
+    private void checkOpSpeak() {
+        if (mSpeech.isSpeaking()) {
             checkOpSpeak();
-        }else {
+        } else {
             mSpeech.speak(opString, TextToSpeech.QUEUE_FLUSH, null, null);
         }
     }
 
-    private void checkEdSpeak(){
-        if (mSpeech.isSpeaking()){
+    private void checkEdSpeak() {
+        if (mSpeech.isSpeaking()) {
             checkEdSpeak();
-        }else {
+        } else {
             mSpeech.speak(edString, TextToSpeech.QUEUE_FLUSH, null, null);
         }
     }
