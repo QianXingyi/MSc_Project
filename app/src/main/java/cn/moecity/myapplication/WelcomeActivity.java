@@ -70,7 +70,7 @@ public class WelcomeActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mSpeech.stop();
+        mSpeech.shutdown();
     }
 
     protected void createLocationRequest() {

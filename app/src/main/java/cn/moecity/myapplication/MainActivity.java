@@ -63,14 +63,29 @@ public class MainActivity extends AppCompatActivity {
     private int distanceTemp;
     private int bearingTemp;
     private Location myNextLoc, currentLoc, destinationLoc;
+    private int destNo;
     private List<POI> steps = new ArrayList<>();
     private int disValue, disDir;
     private int durValue;
     private Node dirTemp;
     private Boolean isDone = false;
-    private Boolean isStart=false;
+    private Boolean isStart = false;
     private TextToSpeech mSpeech;
     private Button startBtn;
+    private String interchange_op, interchange_ed;
+    private String building_53_op, building_53_ed;
+    private String building_58_op, building_58_ed;
+    private String restaurant_op, restaurant_ed;
+    private String library_op, library_ed;
+    private String shop_op, shop_ed;
+    private String eee_op, eee_ed;
+    private String loc1_op, loc1_ed;
+    private String loc2_op, loc2_ed;
+    private String sports_op, sports_ed;
+    private String end_op, end_ed;
+    private String opString, edString;
+    private int choseLoc;
+
 
     private static String readMyInputStream(InputStream is) {
         //binary result to string
@@ -123,6 +138,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initString();
+        choseLoc=0;
+        destNo=0;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
         latLngView = findViewById(R.id.textView);
@@ -143,7 +161,8 @@ public class MainActivity extends AppCompatActivity {
         locationUpdate();
 
         nodeList = nodeDao.CreateNodes();
-
+        opString=interchange_op;
+        edString=interchange_ed;
         //For the function of using file to import nodes
         //JSONArray jsonArray = nodeDao.SaveToJSON(nodeList);
         //Log.e("JSON", jsonArray.toString());
@@ -158,6 +177,69 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void refreshString(int destNo,String locName) {
+        initString();
+
+        switch (destNo) {
+            case 1:
+                opString = interchange_op;
+                edString = interchange_ed;
+                break;
+            case 2:
+                opString = building_53_op;
+                edString = building_53_ed;
+                break;
+            case 3:
+                opString = building_58_op;
+                edString = building_58_ed;
+                break;
+            case 4:
+                opString = restaurant_op;
+                edString = restaurant_ed;
+                break;
+
+            case 5:
+                opString = library_op;
+                edString = library_ed;
+                break;
+
+            case 6:
+                opString = shop_op;
+                edString = shop_ed;
+                break;
+            case 7:
+                opString = eee_op;
+                edString = eee_ed;
+                break;
+            case 8:
+            case 9:
+            case 10:
+                String temp="OK! You want"+locName+".";
+                switch (choseLoc){
+                    case 0:
+                        opString=temp+loc1_op;
+                        edString=loc1_ed;
+                        choseLoc++;
+                        break;
+                    case 1:
+                        opString=temp+loc2_op;
+                        edString=loc2_ed;
+                        choseLoc=3;
+                        break;
+                }
+                break;
+            case 11:
+                opString=sports_op;
+                edString=sports_ed;
+                break;
+            case 12:
+                opString=end_op;
+                edString=end_ed;
+                choseLoc=0;
+                break;
+        }
     }
 
     protected void createLocationRequest() {
@@ -189,6 +271,44 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void initString() {
+
+        interchange_op = getString(R.string.interchange_op);
+        interchange_ed = getString(R.string.interchange_ed);
+
+        building_53_op = getString(R.string.building_53_op);
+        building_53_ed = getString(R.string.building_53_ed);
+
+        building_58_op = getString(R.string.building_58_op);
+        building_58_ed = getString(R.string.building_58_ed);
+
+        restaurant_op = getString(R.string.restaurant_op);
+        restaurant_ed = getString(R.string.restaurant_ed);
+
+        library_op = getString(R.string.library_op);
+        library_ed = getString(R.string.library_ed);
+
+        shop_op = getString(R.string.shop_op);
+        shop_ed = getString(R.string.shop_ed);
+
+        eee_op = getString(R.string.eee_op);
+        eee_ed = getString(R.string.eee_ed);
+
+        loc1_op = getString(R.string.loc1_op);
+        loc1_ed = getString(R.string.loc1_ed);
+
+        loc2_op = getString(R.string.loc2_op);
+        loc2_ed = getString(R.string.loc2_ed);
+
+        sports_op = getString(R.string.sports_op);
+        sports_ed = getString(R.string.sports_ed);
+
+        end_op = getString(R.string.end_op);
+        end_ed = getString(R.string.end_ed);
+
+
+    }
+
     private void locationUpdate() {
         //initial location info
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -214,7 +334,7 @@ public class MainActivity extends AppCompatActivity {
                             latLngView.setText(location.getProvider() + ","
                                     + location.getLatitude() + ","
                                     + location.getLongitude() +
-                                    "," + location.distanceTo(myNextLoc) + "m,"+location.bearingTo(myNextLoc)+".");
+                                    "," + location.distanceTo(myNextLoc) + "m," + location.bearingTo(myNextLoc) + ".");
                             //Log.e("initial", "get the initial data");
                             updateList();
                         } else {
@@ -233,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
                 myNextLoc.setLatitude(nowLocation.getMyLocation().getLocation().getLatitude());
                 currentLoc = locationResult.getLastLocation();
                 distanceTemp = (int) locationResult.getLastLocation().distanceTo(myNextLoc);
-                bearingTemp=(int)locationResult.getLastLocation().bearingTo(myNextLoc);
+                bearingTemp = (int) locationResult.getLastLocation().bearingTo(myNextLoc);
                 //put the distances between nodes and the current location into the object
                 nowLocation.setDistanceToCurrent(distanceTemp);
                 nowLocation.setBearingToCurrent(bearingTemp);
@@ -271,13 +391,13 @@ public class MainActivity extends AppCompatActivity {
                 mSpeech.speak(speakStr, TextToSpeech.QUEUE_FLUSH, null, null);
                 //Log.e("poi",step.getPoiID()+"");
                 step.setUsed(true);
-                isStart=true;
+                isStart = true;
             }
         }
         ///User indoor or not on the main rd
-        if (!isStart&&!mSpeech.isSpeaking()){
+        if (!isStart && !mSpeech.isSpeaking()) {
             mSpeech.speak("Please go to the main road!", TextToSpeech.QUEUE_FLUSH, null, null);
-            isStart=true;
+            isStart = true;
         }
 
         detailView.setText(dirTemp.getLocName() + "\n" + steps.toString());
@@ -287,6 +407,8 @@ public class MainActivity extends AppCompatActivity {
         //update the list of nodes
         List<Map<String, Object>> listItems = new ArrayList<Map<String, Object>>();
         visibleList = new ArrayList<>();
+        if (!mSpeech.isSpeaking())
+            mSpeech.speak(edString, TextToSpeech.QUEUE_FLUSH, null, null);
         for (Node tempNode : nodeList) {
             if (tempNode.getVisible())
                 visibleList.add(tempNode);
@@ -310,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
             //Log.e("direction", "direction");
             isDone = false;
             DelayAsyncTask delayAsyncTask = new DelayAsyncTask();
-            delayAsyncTask.execute(3000);
+            delayAsyncTask.execute(30000);
         }
         simpleAdapter = new SimpleAdapter(this, listItems, R.layout.listitem,
                 new String[]{"icon", "name", "nodeNo"},
@@ -360,24 +482,30 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
+
             startLocationUpdates();
             Log.e("msg", "recovered");
 
             //Init the data with the first node in visible list
             destinationLoc = visibleList.get(0).getMyLocation().getLocation();
+            destNo=visibleList.get(0).getNodeNo();
             disDir = visibleList.get(0).getDistanceToCurrent();
             dirTemp = visibleList.get(0);
             for (Node visibleNode : visibleList) {
 
                 if (visibleNode.getDistanceToCurrent() < disDir) {
                     destinationLoc = visibleNode.getMyLocation().getLocation();
+                    destNo=visibleNode.getNodeNo();
                     disDir = visibleNode.getDistanceToCurrent();
                     dirTemp = visibleNode;
                 }
 
             }
             //Log.e("direction is", dirTemp.getLocName());
-            detailView.setText(dirTemp.getLocName() + "\n" + steps.toString());
+            refreshString(destNo,dirTemp.getLocName());
+            detailView.setText(dirTemp.getLocName() + "\n" + steps.toString()+"\n"+destNo);
+            if (!mSpeech.isSpeaking())
+                mSpeech.speak(opString, TextToSpeech.QUEUE_FLUSH, null, null);
             DirectionApiTask directionApiTask = new DirectionApiTask();
             directionApiTask.execute(5000);
         }
@@ -444,7 +572,7 @@ public class MainActivity extends AppCompatActivity {
                             .show();
                     //Log.e("countlocation",visibleList.get(count).getLocName());
                     steps = jsonDao.getStepList(message.obj.toString());
-                    isStart=false;
+                    isStart = false;
                     //Log.e("steps thread", steps.toString());
                     disValue = jsonDao.getDistance(message.obj.toString());
                     durValue = jsonDao.getDuration(message.obj.toString());
