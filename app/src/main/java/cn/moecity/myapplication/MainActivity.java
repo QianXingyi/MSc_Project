@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
     private SensorManager mSensorManager;
     private Sensor mSensor;
     float[] mValues;
-    private MediaPlayer mediaPlayer;
+    private MediaPlayer mediaPlayer,bgmPlayer;
     private SensorEventListener mListener = new SensorEventListener() {
         public void onSensorChanged(SensorEvent event) {
             mValues = event.values;
@@ -140,13 +140,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        bgmPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bgm);
+        bgmPlayer.start();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
+        isFinished=true;
         mSensorManager.unregisterListener(mListener);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         stopLocationUpdates();
         mSpeech.shutdown();
         mediaPlayer.stop();
+        bgmPlayer.pause();
     }
 
     @Override
@@ -157,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
         stopLocationUpdates();
         mSpeech.shutdown();
         mediaPlayer.stop();
+        bgmPlayer.stop();
     }
 
     private void stopLocationUpdates() {
@@ -223,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void refreshString(int destNo, String locName) {
         initString();
-        String temp = "OK! Then you want to go to" + locName + ",right?";
+        String temp = "Great! Then you want to go to" + locName + ",right?";
         switch (destNo) {
             case 1:
                 opString = interchange_op;
@@ -396,6 +406,9 @@ public class MainActivity extends AppCompatActivity {
                 currentLoc = locationResult.getLastLocation();
                 distanceTemp = (int) locationResult.getLastLocation().distanceTo(myNextLoc);
                 bearingTemp = (int) locationResult.getLastLocation().bearingTo(myNextLoc);
+                if (bearingTemp<0){
+                    bearingTemp+=360;
+                }
                 //put the distances between nodes and the current location into the object
                 nowLocation.setDistanceToCurrent(distanceTemp);
                 nowLocation.setBearingToCurrent(bearingTemp);
@@ -444,7 +457,7 @@ public class MainActivity extends AppCompatActivity {
         }
         ///User indoor or not on the main rd
         if (!isStart && !mSpeech.isSpeaking()) {
-            mSpeech.speak("Please go to the main road!", TextToSpeech.QUEUE_FLUSH, null, null);
+            mSpeech.speak("Please go to the main road first!"+steps.get(0).getHtmlMsg(), TextToSpeech.QUEUE_FLUSH, null, null);
             isStart = true;
         }
 
@@ -492,6 +505,7 @@ public class MainActivity extends AppCompatActivity {
             isFinished=true;
             mSpeech.shutdown();
             mediaPlayer.stop();
+            bgmPlayer.stop();
             startActivity(new Intent(getApplicationContext(),EndActivity.class));
             finish();
         }else checkFinish();
@@ -508,16 +522,16 @@ public class MainActivity extends AppCompatActivity {
                 else
                     mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bibi);
                 if (destDir > userDir) {
-                    Toast.makeText(MainActivity.this, destDir - userDir + "!", Toast.LENGTH_SHORT).show();
-                    if (destDir - userDir < 90)
+                    Toast.makeText(MainActivity.this, destDir - userDir + "", Toast.LENGTH_SHORT).show();
+                    if (destDir - userDir < 40)
                         mediaPlayer.setVolume(1.0f, 1.0f);
                     else if (destDir - userDir > 180)
                         mediaPlayer.setVolume(1.0f, 0.0f);
                     else
                         mediaPlayer.setVolume(0.0f, 1.0f);
                 } else {
-                    Toast.makeText(MainActivity.this, userDir - destDir + "!", Toast.LENGTH_SHORT).show();
-                    if (userDir - destDir < 90)
+                    Toast.makeText(MainActivity.this, userDir - destDir + "", Toast.LENGTH_SHORT).show();
+                    if (userDir - destDir < 40)
                         mediaPlayer.setVolume(1.0f, 1.0f);
                     else if (userDir - destDir > 180)
                         mediaPlayer.setVolume(0.0f, 1.0f);
