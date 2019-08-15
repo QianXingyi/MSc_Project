@@ -2,6 +2,7 @@ package cn.moecity.myapplication;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     private Node dirTemp;
     private Boolean isDone = false;
     private Boolean isStart = false;
+    private Boolean isFinished=false;
     private TextToSpeech mSpeech;
     private Button startBtn;
     private String interchange_op, interchange_ed;
@@ -93,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
     private int choseLoc;
     private SensorManager mSensorManager;
     private Sensor mSensor;
-    private Button mBtn;
     float[] mValues;
     private MediaPlayer mediaPlayer;
     private SensorEventListener mListener = new SensorEventListener() {
@@ -145,6 +146,17 @@ public class MainActivity extends AppCompatActivity {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         stopLocationUpdates();
         mSpeech.shutdown();
+        mediaPlayer.stop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mSensorManager.unregisterListener(mListener);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        stopLocationUpdates();
+        mSpeech.shutdown();
+        mediaPlayer.stop();
     }
 
     private void stopLocationUpdates() {
@@ -451,6 +463,7 @@ public class MainActivity extends AppCompatActivity {
         if (visibleList.size() <= 0) {
             nodeList = nodeDao.CreateNodes();
             updateList();
+
         }
         for (Node visibleNode : visibleList) {
             Map<String, Object> listItem = new HashMap<String, Object>();
@@ -474,36 +487,50 @@ public class MainActivity extends AppCompatActivity {
                 new int[]{R.id.item_img, R.id.item_content, R.id.item_title});
         listView.setAdapter(simpleAdapter);
     }
+    private void checkFinish(){
+        if (!mSpeech.isSpeaking()){
+            isFinished=true;
+            mSpeech.shutdown();
+            mediaPlayer.stop();
+            startActivity(new Intent(getApplicationContext(),EndActivity.class));
+            finish();
+        }else checkFinish();
+    }
 
     private void setMediaPlayer() {
-        if (!mSpeech.isSpeaking()) {
-            mediaPlayer.stop();
-            if (destDis > 200)
-                mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bibi_2);
-            else if (destDis > 100)
-                mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bibi_1);
-            else
-                mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bibi);
-            if (destDir>userDir){
-                Toast.makeText(MainActivity.this,destDir-userDir+"!",Toast.LENGTH_SHORT).show();
-                if (destDir-userDir<90)
-                    mediaPlayer.setVolume(1.0f, 1.0f);
-                else if (destDir-userDir>180)
-                    mediaPlayer.setVolume(1.0f, 0.0f);
+        if (!isFinished) {
+            if (!mSpeech.isSpeaking()) {
+                mediaPlayer.stop();
+                if (destDis > 200)
+                    mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bibi_2);
+                else if (destDis > 100)
+                    mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bibi_1);
                 else
-                    mediaPlayer.setVolume(0.0f, 1.0f);
-            }else{
-                Toast.makeText(MainActivity.this,userDir-destDir+"!",Toast.LENGTH_SHORT).show();
-                if (userDir-destDir<90)
-                    mediaPlayer.setVolume(1.0f, 1.0f);
-                else if (userDir-destDir>180)
-                    mediaPlayer.setVolume(0.0f, 1.0f);
-                else
-                    mediaPlayer.setVolume(1.0f, 0.0f);
+                    mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bibi);
+                if (destDir > userDir) {
+                    Toast.makeText(MainActivity.this, destDir - userDir + "!", Toast.LENGTH_SHORT).show();
+                    if (destDir - userDir < 90)
+                        mediaPlayer.setVolume(1.0f, 1.0f);
+                    else if (destDir - userDir > 180)
+                        mediaPlayer.setVolume(1.0f, 0.0f);
+                    else
+                        mediaPlayer.setVolume(0.0f, 1.0f);
+                } else {
+                    Toast.makeText(MainActivity.this, userDir - destDir + "!", Toast.LENGTH_SHORT).show();
+                    if (userDir - destDir < 90)
+                        mediaPlayer.setVolume(1.0f, 1.0f);
+                    else if (userDir - destDir > 180)
+                        mediaPlayer.setVolume(0.0f, 1.0f);
+                    else
+                        mediaPlayer.setVolume(1.0f, 0.0f);
+                }
+                mediaPlayer.start();
+            } else {
+                setMediaPlayer();
             }
-            mediaPlayer.start();
-        } else {
-            setMediaPlayer();
+        }else {
+            mediaPlayer.stop();
+            mSpeech.shutdown();
         }
 
     }
@@ -596,6 +623,9 @@ public class MainActivity extends AppCompatActivity {
             checkEdSpeak();
         } else {
             mSpeech.speak(edString, TextToSpeech.QUEUE_FLUSH, null, null);
+            if (edString.equals(end_ed)){
+                checkFinish();
+            }
         }
     }
 

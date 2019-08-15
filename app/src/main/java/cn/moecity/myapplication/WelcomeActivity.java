@@ -71,6 +71,7 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         mSpeech.shutdown();
+
     }
 
     protected void createLocationRequest() {
