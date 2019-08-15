@@ -275,8 +275,8 @@ public class MainActivity extends AppCompatActivity {
     protected void createLocationRequest() {
         //get permission
         locationRequest = LocationRequest.create();
-        locationRequest.setInterval(3000);
-        locationRequest.setFastestInterval(3000);
+        locationRequest.setInterval(2000);
+        locationRequest.setFastestInterval(2000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
         SettingsClient client = LocationServices.getSettingsClient(this);
@@ -485,13 +485,18 @@ public class MainActivity extends AppCompatActivity {
             else
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bibi);
             if (destDir>userDir){
-                if (destDir-userDir>180)
+                Toast.makeText(MainActivity.this,destDir-userDir+"!",Toast.LENGTH_SHORT).show();
+                if (destDir-userDir<90)
+                    mediaPlayer.setVolume(1.0f, 1.0f);
+                else if (destDir-userDir>180)
                     mediaPlayer.setVolume(1.0f, 0.0f);
                 else
                     mediaPlayer.setVolume(0.0f, 1.0f);
             }else{
-
-                if (userDir-destDir>180)
+                Toast.makeText(MainActivity.this,userDir-destDir+"!",Toast.LENGTH_SHORT).show();
+                if (userDir-destDir<90)
+                    mediaPlayer.setVolume(1.0f, 1.0f);
+                else if (userDir-destDir>180)
                     mediaPlayer.setVolume(0.0f, 1.0f);
                 else
                     mediaPlayer.setVolume(1.0f, 0.0f);
