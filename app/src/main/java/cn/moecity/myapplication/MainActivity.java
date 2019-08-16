@@ -95,12 +95,10 @@ public class MainActivity extends AppCompatActivity {
     private int choseLoc;
     private SensorManager mSensorManager;
     private Sensor mSensor;
-    float[] mValues;
     private MediaPlayer mediaPlayer,bgmPlayer;
     private SensorEventListener mListener = new SensorEventListener() {
         public void onSensorChanged(SensorEvent event) {
-            mValues = event.values;
-            float direction = mValues[0];
+            float direction = event.values[0];
             userDir = (int) direction;
         }
 
@@ -527,7 +525,7 @@ public class MainActivity extends AppCompatActivity {
                         mediaPlayer.setVolume(1.0f, 1.0f);
                     else if (destDir - userDir > 180)
                         mediaPlayer.setVolume(1.0f, 0.0f);
-                    else
+                    else if (destDir - userDir < 180)
                         mediaPlayer.setVolume(0.0f, 1.0f);
                 } else {
                     Toast.makeText(MainActivity.this, userDir - destDir + "", Toast.LENGTH_SHORT).show();
@@ -535,7 +533,7 @@ public class MainActivity extends AppCompatActivity {
                         mediaPlayer.setVolume(1.0f, 1.0f);
                     else if (userDir - destDir > 180)
                         mediaPlayer.setVolume(0.0f, 1.0f);
-                    else
+                    else if (userDir - destDir < 180)
                         mediaPlayer.setVolume(1.0f, 0.0f);
                 }
                 mediaPlayer.start();
