@@ -142,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         bgmPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bgm);
         bgmPlayer.start();
+        bgmPlayer.setLooping(true);
     }
 
     @Override
