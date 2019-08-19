@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initString();
-        choseLoc = 1;
+        choseLoc = 0;
         destNo = 0;
         destDir = 0;
         destDis = 0;
