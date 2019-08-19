@@ -184,10 +184,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initString();
-        choseLoc = 0;
+        choseLoc = 1;
         destNo = 0;
         destDir = 0;
         destDis = 0;
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
         latLngView = findViewById(R.id.textView);
@@ -566,6 +567,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
+
             DelayAsyncTask delayAsyncTask = new DelayAsyncTask();
             delayAsyncTask.execute(3000);
         }
@@ -623,10 +625,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkOpSpeak() {
+        //Log.e("msg",choseLoc+""+opString);
         if (mSpeech.isSpeaking()) {
             checkOpSpeak();
         } else {
             mSpeech.speak(opString, TextToSpeech.QUEUE_FLUSH, null, null);
+            //Log.e("msg","said");
         }
     }
 
