@@ -45,6 +45,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONArray;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -216,8 +218,8 @@ public class MainActivity extends AppCompatActivity {
         opString = interchange_op;
         edString = interchange_ed;
         //For the function of using file to import nodes
-        //JSONArray jsonArray = nodeDao.SaveToJSON(nodeList);
-        //Log.e("JSON", jsonArray.toString());
+        JSONArray jsonArray = nodeDao.SaveToJSON(nodeList);
+        Log.e("JSON", jsonArray.toString());
 
         updateList();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
