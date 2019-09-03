@@ -198,8 +198,10 @@ public class MainActivity extends AppCompatActivity {
         listView = findViewById(R.id.showNode);
         detailView = findViewById(R.id.textView2);
         mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bibi);
+
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+
         createLocationRequest();
         mSpeech = new TextToSpeech(MainActivity.this, new TTSListener());
         locationCallback = new LocationCallback() {
